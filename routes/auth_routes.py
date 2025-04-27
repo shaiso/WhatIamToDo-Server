@@ -43,8 +43,8 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    # Создаем цель "Ежедневные дела"
-    color = "#A4A4A4"
+    # Создаем цель "Повседневные дела"
+    color = "#CCCCFF"
     daily_goal = Goal(
         user_id=new_user.id,
         title="Повседневные дела",

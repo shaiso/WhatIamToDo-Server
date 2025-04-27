@@ -6,6 +6,7 @@ from models.step_model import Step
 from models.user_model import User
 from datetime import datetime
 from utils.color_utils import get_unique_pastel_color
+from dateutil.parser import isoparse
 
 goals_routes = Blueprint('goals_routes', __name__)
 
@@ -440,4 +441,69 @@ def get_steps_bulk():
             })
 
     return jsonify({"steps": user_steps}), 200
+
+
+@goals_routes.route('/goals/<int:goal_id>/steps/bulk', methods=['POST'])
+@jwt_required()
+def add_steps_bulk(goal_id):
+    """
+    Импорт календаря iOS — массовое добавление шагов к цели "Повседневные дела".
+    Ожидает JSON {"steps": [{"description": str, "date": "YYYY-MM-DDTHH:MM:SS"} , …]}
+    """
+    from datetime import datetime
+    from dateutil import parser  # Убедитесь, что python-dateutil установлен
+
+    current_user_id = int(get_jwt_identity())
+    # Проверяем, что цель принадлежит текущему пользователю
+    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first()
+    if not goal:
+        return jsonify({"message": "Goal not found"}), 404
+
+    data = request.get_json(silent=True) or {}
+    steps_data = data.get('steps', [])
+    if not isinstance(steps_data, list) or not steps_data:
+        return jsonify({"message": "No steps data provided"}), 400
+
+    created_steps = []
+
+    for step_info in steps_data:
+        desc = step_info.get('description', '').strip()
+        if not desc:
+            continue
+
+        date_str = step_info.get('date')
+        date_val = None
+        if date_str:
+            try:
+                # Разбираем ISO8601, включая Z и дробные секунды
+                date_val = parser.isoparse(date_str)
+            except (ValueError, TypeError):
+                date_val = None
+
+        new_step = Step(
+            goal_id=goal.id,
+            title="Импорт IOS календарь",
+            description=desc,
+            date=date_val
+        )
+        db.session.add(new_step)
+        db.session.flush()  # чтобы получить new_step.id до commit
+
+        created_steps.append({
+            "step_id": new_step.id,
+            "title": new_step.title,
+            "description": new_step.description,
+            "date": date_val.isoformat() if date_val else None
+        })
+
+    db.session.commit()
+
+    # Обновляем прогресс цели
+    goal.update_progress()
+    db.session.commit()
+
+    return jsonify({
+        "message": "Steps added successfully",
+        "created_steps": created_steps
+    }), 201
 

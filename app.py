@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from config import settings
 from extensions import mail, db
@@ -28,6 +28,12 @@ def create_app():
     db.init_app(app)
     mail.init_app(app)
     jwt = JWTManager(app)
+    @jwt.expired_token_loader
+
+    def my_expired_token_callback(jwt_header, jwt_payload):
+        return jsonify({
+        "message": "Token has expired"
+   	 }), 401
 
     # Создание таблиц
     with app.app_context():
@@ -44,6 +50,8 @@ def create_app():
 
     return app
 
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
-    app.run()
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
