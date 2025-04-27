@@ -13,7 +13,7 @@ class User(db.Model):
 
     reset_token = db.Column(db.String(50), nullable=True)
     reset_token_expires = db.Column(db.DateTime, nullable=True)
-    reset_token_sent_at = db.Column(db.DateTime, nullable=True)  # <--- новое поле для фиксации времени отправки
+    reset_token_sent_at = db.Column(db.DateTime, nullable=True) 
 
     def generate_reset_token(self, expires_in=30):
         """
