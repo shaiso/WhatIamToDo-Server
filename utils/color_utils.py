@@ -1,5 +1,3 @@
-# utils/color_utils.py
-
 PASTEL_COLORS = [
     "#FFB3BA",  # розоватый
     "#FFDFBA",  # персиковый
@@ -22,7 +20,6 @@ PASTEL_COLORS = [
 def get_unique_pastel_color(used_colors):
     """
     Возвращает цвет из PASTEL_COLORS, который не содержится в used_colors.
-    Если все цвета заняты, вернём None (или сгенерируем новый случайный).
     """
     for c in PASTEL_COLORS:
         if c not in used_colors:
