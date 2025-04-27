@@ -17,7 +17,7 @@ from utils.color_utils import get_unique_pastel_color
 logger = logging.getLogger(__name__)
 ai_routes = Blueprint('ai_routes', __name__)
 
-# Устанавливаем API-ключ OpenAI один раз
+
 openai.api_key = OPENAI_API_KEY
 
 
@@ -265,7 +265,7 @@ def reschedule_tasks():
 
     return jsonify({
         "message": "Tasks rescheduled successfully",
-        "updated_tasks": updated_tasks  # Теперь возвращается список объектов с task_id и new_date
+        "updated_tasks": updated_tasks  
     }), 200
 
 
