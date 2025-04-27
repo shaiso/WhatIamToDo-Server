@@ -46,11 +46,10 @@ def create_goal():
     user_goals = Goal.query.filter_by(user_id=user.id).all()
     used_colors = [g.color for g in user_goals if g.color]
 
-    # Пытаемся получить свободный пастельный цвет
+    
     color = get_unique_pastel_color(used_colors)
     if color is None:
-        # Либо генерим fallback, либо возвращаем ошибку
-        color = "#D3D3D3"  # серый или другой вариант
+        color = "#D3D3D3"  
 
     new_goal = Goal(user_id=user.id, title=title, description=description, color=color)
     db.session.add(new_goal)
@@ -73,10 +72,8 @@ def create_goal():
         )
         db.session.add(new_step)
 
-    # Сохраняем
     db.session.commit()
 
-    # Пересчитываем прогресс (на всякий случай)
     new_goal.update_progress()
     db.session.commit()
 
@@ -451,10 +448,9 @@ def add_steps_bulk(goal_id):
     Ожидает JSON {"steps": [{"description": str, "date": "YYYY-MM-DDTHH:MM:SS"} , …]}
     """
     from datetime import datetime
-    from dateutil import parser  # Убедитесь, что python-dateutil установлен
+    from dateutil import parser  
 
     current_user_id = int(get_jwt_identity())
-    # Проверяем, что цель принадлежит текущему пользователю
     goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first()
     if not goal:
         return jsonify({"message": "Goal not found"}), 404
@@ -475,7 +471,6 @@ def add_steps_bulk(goal_id):
         date_val = None
         if date_str:
             try:
-                # Разбираем ISO8601, включая Z и дробные секунды
                 date_val = parser.isoparse(date_str)
             except (ValueError, TypeError):
                 date_val = None
@@ -498,7 +493,6 @@ def add_steps_bulk(goal_id):
 
     db.session.commit()
 
-    # Обновляем прогресс цели
     goal.update_progress()
     db.session.commit()
 
