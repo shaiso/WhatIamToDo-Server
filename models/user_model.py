@@ -17,8 +17,7 @@ class User(db.Model):
 
     def generate_reset_token(self, expires_in=30):
         """
-        Генерирует код (например 4-значный), сохраняет в БД + время истечения.
-        Также фиксируем reset_token_sent_at = сейчас (для логики "повторной отправки").
+        Генерирует 4-значный код, сохраняет в БД + время истечения.
         """
         code = str(random.randint(1000, 9999))
         self.reset_token = code
