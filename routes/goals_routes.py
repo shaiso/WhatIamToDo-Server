@@ -447,8 +447,6 @@ def add_steps_bulk(goal_id):
     Импорт календаря iOS — массовое добавление шагов к цели "Повседневные дела".
     Ожидает JSON {"steps": [{"description": str, "date": "YYYY-MM-DDTHH:MM:SS"} , …]}
     """
-    from datetime import datetime
-    from dateutil import parser  
 
     current_user_id = int(get_jwt_identity())
     goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first()
